@@ -279,7 +279,7 @@
                 $mostrar = mysqli_query($conexion,$consulta)
                 or die("error al traer los datos");
                 while ($extraido = mysqli_fetch_array($mostrar)){
-                    $linea = ['id' => $extraido['id-pregunta-trivia'], 'nombrePregunta' => $extraido['pregunta'], 'nombreTrivia' => $extraido['nombreTrivia'], 'estado' => $extraido['estado']];
+                    $linea = ['id' => $extraido['id-pregunta-trivia'], 'nombrePregunta' => $extraido['pregunta'], 'nombreTrivia' => $extraido['nombreTrivia']];
                     array_push($lista_asociacion_trivia, $linea);
                 }
                 $listado_json = json_encode($lista_asociacion_trivia);
@@ -317,7 +317,7 @@
                 $mostrar = mysqli_query($conexion,$consulta)
                 or die("error al traer los datos");
                 while ($extraido = mysqli_fetch_array($mostrar)){
-                    $linea = ['id' => $extraido['idminijuego-juego-semanal'], 'nombreJuegoSemanal' => $extraido['nombreJuegoSemanal'], 'nombreMinijuego' => $extraido['nombreMinijuego'], 'estado' => $extraido['estado']];
+                    $linea = ['id' => $extraido['idminijuego-juego-semanal'], 'nombreJuegoSemanal' => $extraido['nombreJuegoSemanal'], 'nombreMinijuego' => $extraido['nombreMinijuego']];
                     array_push($lista_asociacion_juegoSemanal, $linea);
                 }
                 $listado_json = json_encode($lista_asociacion_juegoSemanal);
@@ -331,7 +331,7 @@
                 $mostrar = mysqli_query($conexion,$consulta)
                 or die("error al traer los datos");
                 while ($extraido = mysqli_fetch_array($mostrar)){
-                    $linea = ['id' => $extraido['id-instruccion-juego-semanal'], 'nombreJuegoSemanal' => $extraido['nombreJuegoSemanal'], 'instruccionesJuegoSemanal' => $extraido['instruccionesJuegoSemanal'], 'imagenJuegoSemanal' => $extraido['ImagenJuegoSemanal'], 'estado' => $extraido['estado']];
+                    $linea = ['id' => $extraido['id-instruccion-juego-semanal'], 'nombreJuegoSemanal' => $extraido['nombreJuegoSemanal'], 'instruccionesJuegoSemanal' => $extraido['instruccionesJuegoSemanal'], 'imagenJuegoSemanal' => $extraido['ImagenJuegoSemanal']];
                     array_push($lista_Instrucciones_Juego_Semanal, $linea);
                 }
                 $listado_json = json_encode($lista_Instrucciones_Juego_Semanal);
@@ -773,7 +773,7 @@
                     echo $respuesta;
                 }else{
                     $errorInsertar = ['exito' => 'no', 'mensaje' => 'Error al insertar'];
-                    $mensajeErrorInsertar = json_encode($errorConsulta);
+                    $mensajeErrorInsertar = json_encode($errorInsertar);
                     $insertar = "INSERT INTO preguntas (codigoPregunta, pregunta) VALUES('$codigoPregunta','$nombrePregunta')";
                     $guardar = mysqli_query($conexion,$insertar)
                     or die($mensajeErrorInsertar);
@@ -800,9 +800,8 @@
                     echo $respuesta;
                 }else{
                     $errorInsertar = ['exito' => 'no', 'mensaje' => 'Error al insertar'];
-                    $mensajeErrorInsertar = json_encode($errorConsulta);
-                    $estado = "INACTIVO";
-                    $insertar = "INSERT INTO `preguntas-trivias` (`id-trivia`, `id-pregunta`, estado) VALUES('$idTrivia', '$idPregunta', '$estado')";
+                    $mensajeErrorInsertar = json_encode($errorInsertar);
+                    $insertar = "INSERT INTO `preguntas-trivias` (`id-trivia`, `id-pregunta`) VALUES('$idTrivia', '$idPregunta')";
                     $guardar = mysqli_query($conexion,$insertar)
                     or die($mensajeErrorInsertar);
                     $mensaje = ['exito'=> 'si','mensaje' => 'Asociacion Registrada con éxito'];
@@ -858,9 +857,9 @@
                     echo $respuesta;
                 }else{
                     $errorInsertar = ['exito' => 'no', 'mensaje' => 'Error al insertar'];
-                    $mensajeErrorInsertar = json_encode($errorConsulta);
+                    $mensajeErrorInsertar = json_encode($errorInsertar);
                     $estado = "INACTIVO";
-                    $insertar = "INSERT INTO `minijuegos-juego-semanal` (`id-minijuego`, `id-juego-semanal`, estado) VALUES('$idMinijuego', '$idJuegoSemanal', '$estado')";
+                    $insertar = "INSERT INTO `minijuegos-juego-semanal` (`id-minijuego`, `id-juego-semanal`) VALUES('$idMinijuego', '$idJuegoSemanal')";
                     $guardar = mysqli_query($conexion,$insertar)
                     or die($mensajeErrorInsertar);
                     $mensaje = ['exito'=> 'si','mensaje' => 'Asociacion Registrada con éxito'];
@@ -1234,7 +1233,7 @@
             
             case 'editarTrivia':
                 $errorActualizar = ['exito' => 'no', 'mensaje' => 'Error al actualizar'];
-                $mensajeErrorActualizar = json_encode($errorConsulta);
+                $mensajeErrorActualizar = json_encode($errorActualizar);
                 $id = $datos_post['id'];
                 $nombreTrivia = $datos_post['nombreTrivia'];
                 $descripcionTrivia = $datos_post['descripcionTrivia'];
@@ -1258,7 +1257,7 @@
 
             case 'editarPregunta':
                 $errorActualizar = ['exito' => 'no', 'mensaje' => 'Error al actualizar'];
-                $mensajeErrorActualizar = json_encode($errorConsulta);
+                $mensajeErrorActualizar = json_encode($errorActualizar);
                 $id = $datos_post['id'];
                 $codigoPregunta = $datos_post['codigoPregunta'];
                 $nombrePregunta = $datos_post['nombrePregunta'];
@@ -1281,8 +1280,10 @@
                 break;
             
             case 'editarJuegoSemanal':
+                $errorConsulta = ['exito' => 'no', 'mensaje' => 'Error al consultar'];
+                $mensajeErrorConsulta = json_encode($errorConsulta);
                 $errorActualizar = ['exito' => 'no', 'mensaje' => 'Error al actualizar'];
-                $mensajeErrorActualizar = json_encode($errorConsulta);
+                $mensajeErrorActualizar = json_encode($errorActualizar);
                 $id = $datos_post['id'];
                 $nombreJuegoSemanal = $datos_post['nombreJuegoSemanal'];
                 $metaPuntaje = $datos_post['metaPuntaje'];

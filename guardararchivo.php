@@ -15,15 +15,16 @@ if($metodo === 'POST'){
     switch ($tipo) {
         case 'guardarInstruccionJuegoSemanal':
             $target_path = "imagenes/instrucciones-juego-semanal/";
-            $target_path = $target_path . basename( $_FILES['archivo']['name']); 
-            $ruta_imagen = 'https://apitiempoextra.tiempoextragame.com/api-administracion/' . $target_path;
-            if(move_uploaded_file($_FILES['archivo']['tmp_name'], $target_path)) {
+            $target_path2 = $target_path . basename( $_FILES['archivo']['name']); 
+            $ruta_imagen = 'http://localhost/api-administracion/' . $target_path2;
+            $resultadoMover = move_uploaded_file($_FILES['archivo']['tmp_name'], $target_path2);
+            if($resultadoMover){
                 $idJuegoSemanal = $_POST['juego'];
                 $instruccionesJuegoSemanal = $_POST['descripcion'];          
                 $errorInsertar = ['exito' => 'no', 'mensaje' => 'Error al insertar'];
-                $mensajeErrorInsertar = json_encode($errorConsulta);
+                $mensajeErrorInsertar = json_encode($errorInsertar);
                 $estado = "INACTIVO";
-                $insertar = "INSERT INTO `instrucciones-juego-semanal`(`id-juego-semanal`, ImagenJuegoSemanal, instruccionesJuegoSemanal, estado) VALUES('$idJuegoSemanal', '$ruta_imagen', '$instruccionesJuegoSemanal', '$estado')";
+                $insertar = "INSERT INTO `instrucciones-juego-semanal`(`id-juego-semanal`, ImagenJuegoSemanal, instruccionesJuegoSemanal) VALUES('$idJuegoSemanal', '$ruta_imagen', '$instruccionesJuegoSemanal')";
                 $guardar = mysqli_query($conexion,$insertar)
                 or die($mensajeErrorInsertar);
                 $mensaje = ['exito'=> 'si','mensaje' => 'Istrucción del Juego registrada con éxito'];
@@ -31,9 +32,9 @@ if($metodo === 'POST'){
                 echo $respuesta;
   
             }else{
-                $errorImagen = ['exito' => 'no', 'mensaje' => 'Error al Cargar Imagen en el servidor'];
+                $errorImagen = ['exito' => 'no', 'mensaje' => 'error al cargar imagen', 'temporal' => $_FILES['archivo']['tmp_name'], 'ruta' => $target_path2, 'nombre' => $_FILES['archivo']['name'], 'error' => $_FILES['archivo']['error'], 'resultado' => $resultadoMover, 'isWritable' => is_writable($target_path)];
                 $mensajeErrorIimagen = json_encode($errorImagen);
-                echo $errorImagen;
+                echo $mensajeErrorIimagen;
             }
             break;
 
