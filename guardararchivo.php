@@ -43,7 +43,7 @@ if($metodo === 'POST'){
             $descripcionVideoSemanal = $_POST['descripcionVideo']; 
             $target_path = "videos/video-semana/";
             $target_path = $target_path . basename( $_FILES['archivo']['name']); 
-            $ruta_imagen = 'https://apitiempoextra.tiempoextragame.com/api-administracion/' . $target_path;
+            $ruta_imagen = 'http://localhost/api-administracion/' . $target_path;
             $errorConsulta = ['exito' => 'no', 'mensaje' => 'Error al verificar'];
             $mensajeErrorConsulta = json_encode($errorConsulta);    
             $consulta = "SELECT * FROM `video-semanal` WHERE nombreVideoSemanal = '$nombreVideoSemanal'";
@@ -76,14 +76,13 @@ if($metodo === 'POST'){
         case 'guardarInstruccionSemana':
             $target_path = "imagenes/instrucciones-semana/";
             $target_path = $target_path . basename( $_FILES['archivo']['name']); 
-            $ruta_imagen = 'https://apitiempoextra.tiempoextragame.com/api-administracion/' . $target_path;
+            $ruta_imagen = 'http://localhost/api-administracion/' . $target_path;
             if(move_uploaded_file($_FILES['archivo']['tmp_name'], $target_path)) {
                 $idSemana = $_POST['semana'];
                 $instruccionesSemana = $_POST['descripcion'];            
                 $errorInsertar = ['exito' => 'no', 'mensaje' => 'Error al insertar'];
-                $mensajeErrorInsertar = json_encode($errorConsulta);
-                $estado = "INACTIVO";
-                $insertar = "INSERT INTO instrucciones(instruccionesSemana, `id-semana`, imagenSemana, estado) VALUES('$instruccionesSemana', '$idSemana', '$ruta_imagen', '$estado')";
+                $mensajeErrorInsertar = json_encode($errorInsertar);
+                $insertar = "INSERT INTO instrucciones(instruccionesSemana, `id-semana`, imagenSemana) VALUES('$instruccionesSemana', '$idSemana', '$ruta_imagen')";
                 $guardar = mysqli_query($conexion,$insertar)
                 or die($mensajeErrorInsertar);
                 $mensaje = ['exito'=> 'si','mensaje' => 'Instrucción Semanal registrada con éxito'];
@@ -101,7 +100,7 @@ if($metodo === 'POST'){
             $nombreMedalla = $_POST['nombreMedalla'];  
             $target_path = "imagenes/medallas/";
             $target_path = $target_path . basename( $_FILES['archivo']['name']); 
-            $ruta_imagen = 'https://apitiempoextra.tiempoextragame.com/api-administracion/' . $target_path;
+            $ruta_imagen = 'http://localhost/api-administracion/' . $target_path;
             $errorConsulta = ['exito' => 'no', 'mensaje' => 'Error al verificar'];
             $mensajeErrorConsulta = json_encode($errorConsulta);    
             $consulta = "SELECT * FROM medallas WHERE nombreMedalla = '$nombreMedalla'";
@@ -136,7 +135,7 @@ if($metodo === 'POST'){
             $nombreMedalla = $_POST['nombreMedalla'];  
             $target_path = "imagenes/medallas/";
             $target_path = $target_path . basename( $_FILES['archivo']['name']); 
-            $ruta_imagen = 'https://apitiempoextra.tiempoextragame.com/api-administracion/' . $target_path;
+            $ruta_imagen = 'http://localhost/api-administracion/' . $target_path;
             $errorConsulta = ['exito' => 'no', 'mensaje' => 'Error al verificar'];
             $mensajeErrorConsulta = json_encode($errorConsulta);    
             $consulta = "SELECT * FROM medallas WHERE nombreMedalla = '$nombreMedalla' AND `id-medalla` != '$id'";

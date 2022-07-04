@@ -119,7 +119,7 @@
                 $mostrar = mysqli_query($conexion,$consulta)
                 or die("error al traer los datos");                
                 while ($extraido = mysqli_fetch_array($mostrar)){
-                    $opcion = $extraido['nombreInstitucion'] .' - '.$extraido['nombreNivel'];
+                    $opcion = $extraido['nombreInstitucion'] .' - '.$extraido['nombreNivel'] .' - '.$extraido['temporada'];
                     $linea = ['value' => $extraido['id-nivel'], 'label' => $opcion];
                     array_push($lista_niveles, $linea);
                 }
@@ -410,7 +410,6 @@
                 $extraido = mysqli_fetch_array($mostrar);
                 
                 $respuesta = ['id' => $extraido['id-semana'], 'tituloSemana' => $extraido['tituloSemana'], 'bajadaSemana' => $extraido['bajadaSemana'], 'idMedalla' => $extraido['id-medalla'], 'labelMedalla' => $extraido['nombreMedalla'], 'idJuegoSemanal' => $extraido['id-juego-semanal'], 'labelJuegoSemanal' => $extraido['nombreJuegoSemanal'], 'idVideoSemanal' => $extraido['id-video-semanal'], 'labelVideoSemanal' => $extraido['nombreVideoSemanal'] ];
-                array_push($lista_Instrucciones_Juego_Semanal, $linea);
             
                 $respuesta_json = json_encode($respuesta);
                 echo $respuesta_json;
@@ -424,7 +423,7 @@
                 $mostrar = mysqli_query($conexion,$consulta)
                 or die("error al traer los datos");
                 while ($extraido = mysqli_fetch_array($mostrar)){
-                    $linea = ['id' => $extraido['id-instruccion'], 'instruccionesSemana' => $extraido['instruccionesSemana'], 'imagenSemana' => $extraido['imagenSemana'], 'tituloSemana' => $extraido['tituloSemana'], 'estado' => $extraido['estado']];
+                    $linea = ['id' => $extraido['id-instruccion'], 'instruccionesSemana' => $extraido['instruccionesSemana'], 'imagenSemana' => $extraido['imagenSemana'], 'tituloSemana' => $extraido['tituloSemana']];
                     array_push($lista_Instrucciones_Semana, $linea);
                 }
                 $listado_json = json_encode($lista_Instrucciones_Semana);
@@ -886,7 +885,7 @@
                     echo $respuesta;
                 }else{
                     $errorInsertar = ['exito' => 'no', 'mensaje' => 'Error al insertar'];
-                    $mensajeErrorInsertar = json_encode($errorConsulta);
+                    $mensajeErrorInsertar = json_encode($errorInsertar);
                     $insertar = "INSERT INTO semanas(tituloSemana, bajadaSemana, `id-medalla`, `id-juego-semanal`, `id-video-semanal`) VALUES('$tituloSemana', '$bajadaSemana', '$idMedalla', '$idJuegoSemanal', '$idVideoSemanal')";
                     $guardar = mysqli_query($conexion,$insertar)
                     or die($mensajeErrorInsertar);
@@ -1308,8 +1307,10 @@
                 break;
 
             case 'editarSemana':
+                $errorConsulta = ['exito' => 'no', 'mensaje' => 'Error al consultar'];
+                $mensajeErrorConsulta = json_encode($errorConsulta);
                 $errorActualizar = ['exito' => 'no', 'mensaje' => 'Error al actualizar'];
-                $mensajeErrorActualizar = json_encode($errorConsulta);
+                $mensajeErrorActualizar = json_encode($errorActualizar);
                 $id = $datos_post['id'];
                 $tituloSemana = $datos_post['tituloSemana'];
                 $bajadaSemana = $datos_post['bajadaSemana'];
@@ -1335,9 +1336,11 @@
                 break;
 
             
-            case 'editarProgramaNivel':                
+            case 'editarProgramaNivel':
+                $errorConsulta = ['exito' => 'no', 'mensaje' => 'Error al consultar'];
+                $mensajeErrorConsulta = json_encode($errorConsulta);
                 $errorActualizar = ['exito' => 'no', 'mensaje' => 'Error al actualizar'];
-                $mensajeErrorActualizar = json_encode($errorConsulta);
+                $mensajeErrorActualizar = json_encode($errorActualizar);
                 $id = $datos_post['id'];
                 $idNivel = $datos_post['idNivel'];
                 $nombreProgramaNivel = $datos_post['nombreProgramaNivel'];
