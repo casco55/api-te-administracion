@@ -20,6 +20,46 @@
     if($metodo === 'GET'){
         $tipo = $_GET['type'];        
         switch ($tipo) {
+            case 'buscarMiembros':
+                $idProgramaNivel = $_GET['idProgramaNivel'];
+                $listaProfesores = [];
+                $listaAlumnos = [];
+                $consulta = "SELECT * FROM `usuarios-programa-nivel` JOIN usuarios on `usuarios-programa-nivel`.`id-usuario` = usuarios.`id-usuario` WHERE `usuarios-programa-nivel`.`id-programa-nivel` = $idProgramaNivel";
+                $mostrar = mysqli_query($conexion,$consulta)
+                or die("error al traer los datos");
+                while ($extraido = mysqli_fetch_array($mostrar)) {
+                    if($extraido['id-rol'] == 2){
+                        $linea = ['idUsuario' => $extraido['id-usuario'], 'rutUsuario' => $extraido['rutUsuario'], 'nombreUsuario' => $extraido['nombreUsuario'], 'apellidoUsuario' => $extraido['apellidoUsuario']];
+                        array_push($listaProfesores, $linea);   
+                    }
+                    if($extraido['id-rol'] == 3){
+                        $linea = ['idUsuario' => $extraido['id-usuario'], 'rutUsuario' => $extraido['rutUsuario'], 'nombreUsuario' => $extraido['nombreUsuario'], 'apellidoUsuario' => $extraido['apellidoUsuario']];
+                        array_push($listaAlumnos, $linea);
+                    }
+                }
+                $respuesta = [
+                    'profesores' => $listaProfesores,
+                    'alumnos' => $listaAlumnos
+                ];
+                $respuesta_json = json_encode($respuesta);
+                echo $respuesta_json;         
+                break;
+            case 'buscarUsuarios':
+                $listaUsuarios = [];
+                $buscarUsuario = $_GET['search'];
+                $idProgramaNivel = $_GET['idProgramaNivel'];
+                $consulta = "SELECT usuarios.`id-usuario`, usuarios.rutUsuario, usuarios.nombreUsuario, usuarios.apellidoUsuario, rol.nombreRol, `usuarios-programa-nivel`.`id-programa-nivel` FROM usuarios LEFT JOIN `usuarios-programa-nivel` ON usuarios.`id-usuario` = `usuarios-programa-nivel`.`id-usuario` JOIN rol ON usuarios.`id-rol` = rol.`id-rol` WHERE (rutUsuario LIKE '%$buscarUsuario%' OR nombreUsuario LIKE '%$buscarUsuario%' OR apellidoUsuario LIKE '%$buscarUsuario%') AND (usuarios.`id-rol` = 2 OR usuarios.`id-rol` = 3) ORDER BY rutUsuario ASC";
+                $mostrar = mysqli_query($conexion,$consulta)
+                or die("error al traer los datos");
+                while ($extraido = mysqli_fetch_array($mostrar)){
+                    if($extraido['id-programa-nivel'] == null || $extraido['id-programa-nivel'] != $idProgramaNivel){
+                        $linea = ['idUsuario' => $extraido['id-usuario'], 'rutUsuario' => $extraido['rutUsuario'], 'nombreUsuario' => $extraido['nombreUsuario'], 'apellidoUsuario' => $extraido['apellidoUsuario'], 'nombreRol' => $extraido['nombreRol']];
+                        array_push($listaUsuarios, $linea);
+                    }
+                }
+                $listado_json = json_encode($listaUsuarios);
+                echo $listado_json;
+                break;                
             case 'tokenLogin':
                 $token = $_GET['token'];
                 $respuesta = tokenLogin($conexion, $token);
@@ -171,7 +211,7 @@
                 $mostrar = mysqli_query($conexion, $consulta)
                 or die("error al traer los datos");
                 $extraido = mysqli_fetch_array($mostrar);
-                $respuesta = ['idUsuario' => $extraido['id-usuario'], 'rutUsuario' => $extraido['rutUsuario'], 'nombreUsuario' => $extraido['nombreUsuario'], 'apellidoUsuario' => $extraido['apellidoUsuario'], 'mailUsuario' => $extraido['mailUsuario'], 'fonoUsuario' => $extraido['fonoUsuario'], 'userUsuario' => $extraido['userUsuario'], 'claveUsuario' => $extraido['claveUsuario'], 'idRol' => $extraido['id-rol'], 'labelRol' => $extraido['nombreRol'], 'sexoUsuario' => $extraido['sexoUsuario'], 'fechaNacimientoUsuario' => $extraido['fechaNacimientoUsuario']];
+                $respuesta = ['idUsuario' => $extraido['id-usuario'], 'rutUsuario' => $extraido['rutUsuario'], 'nombreUsuario' => $extraido['nombreUsuario'], 'apellidoUsuario' => $extraido['apellidoUsuario'], 'mailUsuario' => $extraido['mailUsuario'], 'fonoUsuario' => $extraido['fonoUsuario'], 'userUsuario' => $extraido['userUsuario'], 'claveUsuario' => $extraido['claveUsuario'], 'idRol' => $extraido['id-rol'], 'labelRol' => $extraido['nombreRol'], 'sexoUsuario' => $extraido['sexoUsuario'], 'fechaNacimientoUsuario' => $extraido['fechaNacimientoUsuario'], 'nombreApoderado' => $extraido['nombreApoderado'], 'fonoApoderado' => $extraido['fonoApoderado'], 'mailApoderado' => $extraido['mailApoderado']];
                 $respuesta_json = json_encode($respuesta);
                 echo $respuesta_json;
                 break;
@@ -488,11 +528,11 @@
 
                 $idSemanaProgramaNivel = $_GET['id'];
                 $lista_mensajes_semana_programa_nivel = [];
-                $consulta = "SELECT * FROM `mensajes-semana-programa-nivel` JOIN `semana-programa-nivel` ON `mensajes-semana-programa-nivel`.`id-semana-programa-nivel` = `semana-programa-nivel`.`id-semana-programa-nivel` WHERE `semana-programa-nivel`.`id-semana-programa-nivel`  ='$idSemanaProgramaNivel'";
+                $consulta = "SELECT * FROM `mensaje-semana-programa-nivel` JOIN `semana-programa-nivel` ON `mensaje-semana-programa-nivel`.`id-semana-programa-nivel` = `semana-programa-nivel`.`id-semana-programa-nivel` WHERE `semana-programa-nivel`.`id-semana-programa-nivel`  ='$idSemanaProgramaNivel'";
                 $mostrar = mysqli_query($conexion,$consulta)
                 or die("error al traer los datos");
                 while ($extraido = mysqli_fetch_array($mostrar)){
-                    $linea = ['id' => $extraido['id-mensaje-semana-programa-nivel'], 'tituloMensajeSemanaProgramaNivel' => $extraido['tituloMensajeSemanaProgramaNivel'], 'DescripcionMensajeSemanaProgramaNivel' => $extraido['DescripcionMensajeSemanaProgramaNivel'], 'estadoMensajeProgramaNivel' => $extraido['estadoMensajeProgramaNivel']];
+                    $linea = ['id' => $extraido['id-mensaje-semana-programa-nivel'], 'tituloMensajeSemanaProgramaNivel' => $extraido['tituloMensajeSemanaProgramaNivel'], 'DescripcionMensajeSemanaProgramaNivel' => $extraido['DescripcionMensajeSemanaProgramaNivel']];
                     array_push($lista_mensajes_semana_programa_nivel, $linea);
                 }
                 $listado_json = json_encode($lista_mensajes_semana_programa_nivel);
@@ -576,6 +616,33 @@
             $tipo = $datos_post['tipo'];
             
          switch($tipo){
+            case 'guardarAsociacionUsuarioProgramaNivel':
+                $idUsuario = $datos_post['idUsuario'];
+                $idProgramaNivel = $datos_post['idProgramaNivel'];
+                $errorConsulta = ['exito' => 'no', 'mensaje' => 'Error al verificar'];
+                $mensajeErrorConsulta = json_encode($errorConsulta);    
+                $consulta = "SELECT * FROM `usuarios-programa-nivel` WHERE `id-usuario` = '$idUsuario' AND `id-programa-nivel` = '$idProgramaNivel'";
+                $mostrar = mysqli_query($conexion,$consulta)
+                or die($mensajeErrorConsulta);
+                $row_cnt = mysqli_num_rows($mostrar);
+                if ($row_cnt > 0){
+                    $mensaje = ['exito'=> 'no','mensaje' => 'Este usuario ya está asociado a este programa nivel'];
+                    $respuesta = json_encode($mensaje);
+                    echo $respuesta;    
+                } else {
+                    $errorInsertar = ['exito' => 'no', 'mensaje' => 'Error al insertar'];
+                    $mensajeErrorInsertar = json_encode($errorInsertar);
+                    $insertar = "INSERT INTO `usuarios-programa-nivel`(`id-usuario`, `id-programa-nivel`) VALUES('$idUsuario', '$idProgramaNivel')";
+                    $guardar = mysqli_query($conexion,$insertar)
+                    or die($mensajeErrorInsertar);
+                    $mensaje = ['exito'=> 'si','mensaje' => 'Usuario asociado correctamente'];
+                    $respuesta = json_encode($mensaje);
+                    echo $respuesta;
+                }
+                
+
+                
+                break;
             case 'guardarCorporacion':
                 $rutCorporacion = $datos_post['rutCorporacion'];
                 $nombreCorporacion = $datos_post['nombreCorporacion'];
@@ -673,7 +740,10 @@
                 $idRol = $datos_post['idRol'];
                 $sexoUsuario = $datos_post['sexoUsuario'];
                 $fechaNacimientoUsuario = $datos_post['fechaNacimientoUsuario'];
-                $respuesta = guardarUsuario($conexion, $rutUsuario, $nombreUsuario, $apellidoUsuario, $mailUsuario, $fonoUsuario, $userUsuario, $claveUsuario, $idRol, $sexoUsuario, $fechaNacimientoUsuario);
+                $nombreApoderado = $datos_post['nombreApoderado'];
+                $fonoApoderado = $datos_post['fonoApoderado'];
+                $mailApoderado = $datos_post['mailApoderado'];
+                $respuesta = guardarUsuario($conexion, $rutUsuario, $nombreUsuario, $apellidoUsuario, $mailUsuario, $fonoUsuario, $userUsuario, $claveUsuario, $idRol, $sexoUsuario, $fechaNacimientoUsuario, $nombreApoderado, $fonoApoderado, $mailApoderado);
                 echo $respuesta;
                 break;
 
@@ -886,7 +956,7 @@
                 }else{
                     $errorInsertar = ['exito' => 'no', 'mensaje' => 'Error al insertar'];
                     $mensajeErrorInsertar = json_encode($errorInsertar);
-                    $insertar = "INSERT INTO semanas(tituloSemana, bajadaSemana, `id-medalla`, `id-juego-semanal`, `id-video-semanal`) VALUES('$tituloSemana', '$bajadaSemana', '$idMedalla', '$idJuegoSemanal', '$idVideoSemanal')";
+                    $insertar = "INSERT INTO semanas (tituloSemana, bajadaSemana, `id-medalla`, `id-juego-semanal`, `id-video-semanal`) VALUES ('$tituloSemana', '$bajadaSemana', '$idMedalla', '$idJuegoSemanal', '$idVideoSemanal')";
                     $guardar = mysqli_query($conexion,$insertar)
                     or die($mensajeErrorInsertar);
                     $mensaje = ['exito'=> 'si','mensaje' => 'Semana Registrada con éxito'];
@@ -966,10 +1036,10 @@
                 $tituloMensajeSemanaProgramaNivel = $datos_post['tituloMensajeSemanaProgramaNivel'];
                 $DescripcionMensajeSemanaProgramaNivel = $datos_post['DescripcionMensajeSemanaProgramaNivel'];
                 $idSemanaProgramaNivel = $datos_post['idSemanaProgramaNivel']; 
-                $estadoMensajeProgramaNivel = $datos_post['estadoMensajeProgramaNivel'];                
+              
                 $errorConsulta = ['exito' => 'no', 'mensaje' => 'Error al verificar'];
                 $mensajeErrorConsulta = json_encode($errorConsulta);    
-                $consulta = "SELECT * FROM `mensajes-semana-programa-nivel` WHERE `id-semana-programa-nivel`='$idSemanaProgramaNivel' AND tituloMensajeSemanaProgramaNivel='$tituloMensajeSemanaProgramaNivel'";
+                $consulta = "SELECT * FROM `mensaje-semana-programa-nivel` WHERE `id-semana-programa-nivel`='$idSemanaProgramaNivel' AND tituloMensajeSemanaProgramaNivel='$tituloMensajeSemanaProgramaNivel'";
                 $mostrar = mysqli_query($conexion,$consulta)
                 or die($mensajeErrorConsulta);
                 $row_cnt = mysqli_num_rows($mostrar);           
@@ -980,7 +1050,7 @@
                 }else{
                     $errorInsertar = ['exito' => 'no', 'mensaje' => 'Error al insertar'];
                     $mensajeErrorInsertar = json_encode($errorInsertar);
-                    $insertar = "INSERT INTO `mensajes-semana-programa-nivel`(tituloMensajeSemanaProgramaNivel, DescripcionMensajeSemanaProgramaNivel, `id-semana-programa-nivel`, estadoMensajeProgramaNivel) VALUES('$tituloMensajeSemanaProgramaNivel', '$DescripcionMensajeSemanaProgramaNivel', '$idSemanaProgramaNivel', '$estadoMensajeProgramaNivel')";
+                    $insertar = "INSERT INTO `mensaje-semana-programa-nivel`(tituloMensajeSemanaProgramaNivel, DescripcionMensajeSemanaProgramaNivel, `id-semana-programa-nivel`) VALUES('$tituloMensajeSemanaProgramaNivel', '$DescripcionMensajeSemanaProgramaNivel', '$idSemanaProgramaNivel')";
                     $guardar = mysqli_query($conexion,$insertar)
                     or die($mensajeErrorInsertar);
                     $mensaje = ['exito'=> 'si','mensaje' => 'Mensaje Registrado con éxito'];
@@ -1149,6 +1219,9 @@
                 $idRol = $datos_post['idRol'];
                 $sexoUsuario = $datos_post['sexoUsuario'];
                 $fechaNacimientoUsuario = $datos_post['fechaNacimientoUsuario'];
+                $nombreApoderado = $datos_post['nombreApoderado'];
+                $fonoApoderado = $datos_post['fonoApoderado'];
+                $mailApoderado = $datos_post['mailApoderado'];
                 $errorConsulta = ['exito' => 'no', 'mensaje' => 'Error al verificar'];
                 $mensajeErrorConsulta = json_encode($errorConsulta); 
                 $consulta = "SELECT * FROM  usuarios WHERE rutUsuario = '$rutUsuario' AND `id-usuario` != '$id' ";
@@ -1161,14 +1234,14 @@
                     echo $respuesta;
                 }else{
                     if ($fechaNacimientoUsuario == '') {
-                        $consulta = "UPDATE usuarios SET rutUsuario='$rutUsuario', nombreUsuario= '$nombreUsuario', apellidoUsuario = '$apellidoUsuario', mailUsuario = '$mailUsuario', fonoUsuario = '$fonoUsuario', userUsuario = '$userUsuario', claveUsuario = '$claveUsuario', `id-rol` = '$idRol', sexoUsuario = '$sexoUsuario'  WHERE `id-usuario`='$id'";
+                        $consulta = "UPDATE usuarios SET rutUsuario='$rutUsuario', nombreUsuario= '$nombreUsuario', apellidoUsuario = '$apellidoUsuario', mailUsuario = '$mailUsuario', fonoUsuario = '$fonoUsuario', userUsuario = '$userUsuario', claveUsuario = '$claveUsuario', `id-rol` = '$idRol', sexoUsuario = '$sexoUsuario', nombreApoderado = '$nombreApoderado', 'fonoApoderado' = '$fonoApoderado', 'mailApoderado' = '$mailApoderado'  WHERE `id-usuario`='$id'";
                         $resultado = mysqli_query($conexion,$consulta)
                         or die($mensajeErrorActualizar);
                         $mensaje = ['exito'=> 'si','mensaje' => 'Usuario actualizado con éxito'];
                         $respuesta = json_encode($mensaje);
                         echo $respuesta;
                     }else {
-                        $consulta = "UPDATE usuarios SET rutUsuario='$rutUsuario', nombreUsuario= '$nombreUsuario', apellidoUsuario = '$apellidoUsuario', mailUsuario = '$mailUsuario', fonoUsuario = '$fonoUsuario', userUsuario = '$userUsuario', claveUsuario = '$claveUsuario', `id-rol` = '$idRol', sexoUsuario = '$sexoUsuario', fechaNacimientoUsuario = '$fechaNacimientoUsuario' WHERE `id-usuario`='$id'";
+                        $consulta = "UPDATE usuarios SET rutUsuario='$rutUsuario', nombreUsuario= '$nombreUsuario', apellidoUsuario = '$apellidoUsuario', mailUsuario = '$mailUsuario', fonoUsuario = '$fonoUsuario', userUsuario = '$userUsuario', claveUsuario = '$claveUsuario', `id-rol` = '$idRol', sexoUsuario = '$sexoUsuario', fechaNacimientoUsuario = '$fechaNacimientoUsuario', , nombreApoderado = '$nombreApoderado', 'fonoApoderado' = '$fonoApoderado', 'mailApoderado' = '$mailApoderado' WHERE `id-usuario`='$id'";
                         $resultado = mysqli_query($conexion,$consulta)
                         or die($mensajeErrorActualizar);
                         $mensaje = ['exito'=> 'si','mensaje' => 'Usuario actualizado con éxito'];
@@ -1485,8 +1558,32 @@
 
             default:
                 break;
-        }
+        
     }
+    }else if($metodo == 'DELETE') {
+        
+        $tipo = $_GET['type'];  
+        switch ($tipo) {
+            case 'deleteAsociacionCorporacionInstitucion':
+                $errorEliminar = ['exito' => 'no', 'mensaje' => 'Error al eliminar'];
+                $mensajeErrorEliminar = json_encode($errorEliminar);
+                $idAsociacionCorporacionInstitucion = $_GET['id'];
+                $consulta = "DELETE FROM `corporacion-institucion` WHERE `id-corporacion-institucion`='$idAsociacionCorporacionInstitucion'";
+                $resultado = mysqli_query($conexion,$consulta)
+                or die($mensajeErrorEliminar);
+                $mensaje = ['exito'=> 'si','mensaje' => 'Asociación de Corporación-Institución, eliminada con éxito'];
+                $respuesta = json_encode($mensaje);
+                echo $respuesta;
+
+                break;
+            
+            default:
+                # code...
+                break; 
+            }
+        
+    }
+    
 
     
     

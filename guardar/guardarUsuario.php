@@ -1,5 +1,5 @@
 <?php
-    function guardarUsuario($conexion,$rutUsuario, $nombreUsuario, $apellidoUsuario, $mailUsuario, $fonoUsuario, $userUsuario, $claveUsuario, $idRol, $sexoUsuario, $fechaNacimientoUsuario) {
+    function guardarUsuario($conexion,$rutUsuario, $nombreUsuario, $apellidoUsuario, $mailUsuario, $fonoUsuario, $userUsuario, $claveUsuario, $idRol, $sexoUsuario, $fechaNacimientoUsuario, $nombreApoderado, $fonoApoderado, $mailApoderado) {
 
         $errorConsulta = ['exito' => 'no', 'mensaje' => 'Error al verificar'];
         $mensajeErrorConsulta = json_encode($errorConsulta); 
@@ -15,7 +15,7 @@
             $errorInsertar = ['exito' => 'no', 'mensaje' => 'Error al insertar a'];
             $mensajeErrorInsertar = json_encode($errorInsertar);
             if ($fechaNacimientoUsuario == '') {
-                $insertar = "INSERT INTO usuarios(rutUsuario, nombreUsuario, apellidoUsuario, mailUsuario, fonoUsuario, userUsuario, claveUsuario, `id-rol`, sexoUsuario, fechaCreacionUsuario) VALUES('$rutUsuario', '$nombreUsuario', '$apellidoUsuario', '$mailUsuario', '$fonoUsuario', '$userUsuario', '$claveUsuario', '$idRol', '$sexoUsuario', curdate())";
+                $insertar = "INSERT INTO usuarios(rutUsuario, nombreUsuario, apellidoUsuario, mailUsuario, fonoUsuario, userUsuario, claveUsuario, `id-rol`, sexoUsuario, fechaCreacionUsuario, nombreApoderado, fonoApoderado, mailApoderado) VALUES('$rutUsuario', '$nombreUsuario', '$apellidoUsuario', '$mailUsuario', '$fonoUsuario', '$userUsuario', '$claveUsuario', '$idRol', '$sexoUsuario', curdate(), '$nombreApoderado', '$fonoApoderado', '$mailApoderado')";
                 $guardar = mysqli_query($conexion,$insertar)
                 or die($mensajeErrorInsertar);
                 
@@ -23,7 +23,7 @@
                 $respuesta = json_encode($mensaje);
                 return $respuesta;
             }else {
-                $insertar = "INSERT INTO usuarios(rutUsuario, nombreUsuario, apellidoUsuario, mailUsuario, fonoUsuario, userUsuario, claveUsuario, `id-rol`, sexoUsuario, fechaNacimientoUsuario, fechaCreacionUsuario) VALUES('$rutUsuario', '$nombreUsuario', '$apellidoUsuario', '$mailUsuario', '$fonoUsuario', '$userUsuario', '$claveUsuario', '$idRol', '$sexoUsuario', '$fechaNacimientoUsuario', curdate())";
+                $insertar = "INSERT INTO usuarios(rutUsuario, nombreUsuario, apellidoUsuario, mailUsuario, fonoUsuario, userUsuario, claveUsuario, `id-rol`, sexoUsuario, fechaNacimientoUsuario, fechaCreacionUsuario) VALUES('$rutUsuario', '$nombreUsuario', '$apellidoUsuario', '$mailUsuario', '$fonoUsuario', '$userUsuario', '$claveUsuario', '$idRol', '$sexoUsuario', '$fechaNacimientoUsuario', curdate(), '$nombreApoderado', '$fonoApoderado', '$mailApoderado')";
                 $guardar = mysqli_query($conexion,$insertar)
                 or die($mensajeErrorInsertar);
                 
