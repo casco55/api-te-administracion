@@ -29,11 +29,11 @@
                 or die("error al traer los datos");
                 while ($extraido = mysqli_fetch_array($mostrar)) {
                     if($extraido['id-rol'] == 2){
-                        $linea = ['idUsuario' => $extraido['id-usuario'], 'rutUsuario' => $extraido['rutUsuario'], 'nombreUsuario' => $extraido['nombreUsuario'], 'apellidoUsuario' => $extraido['apellidoUsuario']];
+                        $linea = ['idUsuario' => $extraido['id-usuario'], 'rutUsuario' => $extraido['rutUsuario'], 'nombreUsuario' => $extraido['nombreUsuario'], 'apellidoUsuario' => $extraido['apellidoUsuario'], 'idUsuarioProgramaNivel' => $extraido['id-usuario-programa-nivel']];
                         array_push($listaProfesores, $linea);   
                     }
                     if($extraido['id-rol'] == 3){
-                        $linea = ['idUsuario' => $extraido['id-usuario'], 'rutUsuario' => $extraido['rutUsuario'], 'nombreUsuario' => $extraido['nombreUsuario'], 'apellidoUsuario' => $extraido['apellidoUsuario']];
+                        $linea = ['idUsuario' => $extraido['id-usuario'], 'rutUsuario' => $extraido['rutUsuario'], 'nombreUsuario' => $extraido['nombreUsuario'], 'apellidoUsuario' => $extraido['apellidoUsuario'], 'idUsuarioProgramaNivel' => $extraido['id-usuario-programa-nivel']];
                         array_push($listaAlumnos, $linea);
                     }
                 }
@@ -48,14 +48,18 @@
                 $listaUsuarios = [];
                 $buscarUsuario = $_GET['search'];
                 $idProgramaNivel = $_GET['idProgramaNivel'];
-                $consulta = "SELECT usuarios.`id-usuario`, usuarios.rutUsuario, usuarios.nombreUsuario, usuarios.apellidoUsuario, rol.nombreRol, `usuarios-programa-nivel`.`id-programa-nivel` FROM usuarios LEFT JOIN `usuarios-programa-nivel` ON usuarios.`id-usuario` = `usuarios-programa-nivel`.`id-usuario` JOIN rol ON usuarios.`id-rol` = rol.`id-rol` WHERE (rutUsuario LIKE '%$buscarUsuario%' OR nombreUsuario LIKE '%$buscarUsuario%' OR apellidoUsuario LIKE '%$buscarUsuario%') AND (usuarios.`id-rol` = 2 OR usuarios.`id-rol` = 3) ORDER BY rutUsuario ASC";
+                $consulta = "SELECT usuarios.`id-usuario`, usuarios.rutUsuario, usuarios.nombreUsuario, usuarios.apellidoUsuario, rol.nombreRol, GROUP_CONCAT(`usuarios-programa-nivel`.`id-programa-nivel`) AS lista FROM usuarios LEFT JOIN `usuarios-programa-nivel` ON usuarios.`id-usuario` = `usuarios-programa-nivel`.`id-usuario` JOIN rol ON usuarios.`id-rol` = rol.`id-rol` WHERE (rutUsuario LIKE '%$buscarUsuario%' OR nombreUsuario LIKE '%$buscarUsuario%' OR apellidoUsuario LIKE '%$buscarUsuario%') AND (usuarios.`id-rol` = 2 OR usuarios.`id-rol` = 3) GROUP BY usuarios.`id-usuario` ORDER BY rutUsuario ASC";
                 $mostrar = mysqli_query($conexion,$consulta)
                 or die("error al traer los datos");
                 while ($extraido = mysqli_fetch_array($mostrar)){
-                    if($extraido['id-programa-nivel'] == null || $extraido['id-programa-nivel'] != $idProgramaNivel){
-                        $linea = ['idUsuario' => $extraido['id-usuario'], 'rutUsuario' => $extraido['rutUsuario'], 'nombreUsuario' => $extraido['nombreUsuario'], 'apellidoUsuario' => $extraido['apellidoUsuario'], 'nombreRol' => $extraido['nombreRol']];
+                    $list = explode(",", $extraido['lista']);
+                    if(!in_array($idProgramaNivel, $list)){
+                        $linea = ['idUsuario' => $extraido['id-usuario'], 'rutUsuario' => $extraido['rutUsuario'], 'nombreUsuario' => $extraido['nombreUsuario'], 'apellidoUsuario' => $extraido['apellidoUsuario'], 'nombreRol' => $extraido['nombreRol'], 'idProgramaNivel' => $extraido['lista']];
                         array_push($listaUsuarios, $linea);
                     }
+                        
+            
+                    
                 }
                 $listado_json = json_encode($listaUsuarios);
                 echo $listado_json;
@@ -1234,14 +1238,14 @@
                     echo $respuesta;
                 }else{
                     if ($fechaNacimientoUsuario == '') {
-                        $consulta = "UPDATE usuarios SET rutUsuario='$rutUsuario', nombreUsuario= '$nombreUsuario', apellidoUsuario = '$apellidoUsuario', mailUsuario = '$mailUsuario', fonoUsuario = '$fonoUsuario', userUsuario = '$userUsuario', claveUsuario = '$claveUsuario', `id-rol` = '$idRol', sexoUsuario = '$sexoUsuario', nombreApoderado = '$nombreApoderado', 'fonoApoderado' = '$fonoApoderado', 'mailApoderado' = '$mailApoderado'  WHERE `id-usuario`='$id'";
+                        $consulta = "UPDATE usuarios SET rutUsuario='$rutUsuario', nombreUsuario= '$nombreUsuario', apellidoUsuario = '$apellidoUsuario', mailUsuario = '$mailUsuario', fonoUsuario = '$fonoUsuario', userUsuario = '$userUsuario', claveUsuario = '$claveUsuario', `id-rol` = '$idRol', sexoUsuario = '$sexoUsuario', nombreApoderado = '$nombreApoderado', fonoApoderado = '$fonoApoderado', mailApoderado = '$mailApoderado'  WHERE `id-usuario`='$id'";
                         $resultado = mysqli_query($conexion,$consulta)
                         or die($mensajeErrorActualizar);
                         $mensaje = ['exito'=> 'si','mensaje' => 'Usuario actualizado con éxito'];
                         $respuesta = json_encode($mensaje);
                         echo $respuesta;
                     }else {
-                        $consulta = "UPDATE usuarios SET rutUsuario='$rutUsuario', nombreUsuario= '$nombreUsuario', apellidoUsuario = '$apellidoUsuario', mailUsuario = '$mailUsuario', fonoUsuario = '$fonoUsuario', userUsuario = '$userUsuario', claveUsuario = '$claveUsuario', `id-rol` = '$idRol', sexoUsuario = '$sexoUsuario', fechaNacimientoUsuario = '$fechaNacimientoUsuario', , nombreApoderado = '$nombreApoderado', 'fonoApoderado' = '$fonoApoderado', 'mailApoderado' = '$mailApoderado' WHERE `id-usuario`='$id'";
+                        $consulta = "UPDATE usuarios SET rutUsuario='$rutUsuario', nombreUsuario= '$nombreUsuario', apellidoUsuario = '$apellidoUsuario', mailUsuario = '$mailUsuario', fonoUsuario = '$fonoUsuario', userUsuario = '$userUsuario', claveUsuario = '$claveUsuario', `id-rol` = '$idRol', sexoUsuario = '$sexoUsuario', fechaNacimientoUsuario = '$fechaNacimientoUsuario', nombreApoderado = '$nombreApoderado', fonoApoderado = '$fonoApoderado', mailApoderado = '$mailApoderado' WHERE `id-usuario`='$id'";
                         $resultado = mysqli_query($conexion,$consulta)
                         or die($mensajeErrorActualizar);
                         $mensaje = ['exito'=> 'si','mensaje' => 'Usuario actualizado con éxito'];
@@ -1576,6 +1580,31 @@
                 echo $respuesta;
 
                 break;
+            
+            case 'deleteAsociacionTriviaPregunta':
+                $errorEliminar = ['exito' => 'no', 'mensaje' => 'Error al eliminar'];
+                $mensajeErrorEliminar = json_encode($errorEliminar);
+                $idAsociacionTriviaPregunta = $_GET['id'];
+                $consulta = "DELETE FROM `preguntas-trivias` WHERE `id-pregunta-trivia`='$idAsociacionTriviaPregunta'";
+                $resultado = mysqli_query($conexion,$consulta)
+                or die($mensajeErrorEliminar);
+                $mensaje = ['exito'=> 'si','mensaje' => 'Asociación de Trivias-Preguntas, eliminada con éxito'];
+                $respuesta = json_encode($mensaje);
+                echo $respuesta;
+                break;
+            
+            case 'deleteUsuarioProgramaNivel':
+                $errorEliminar = ['exito' => 'no', 'mensaje' => 'Error al eliminar'];
+                $mensajeErrorEliminar = json_encode($errorEliminar);
+                $idUsuarioProgramaNivel = $_GET['id'];
+                $consulta = "DELETE FROM `usuarios-programa-nivel` WHERE `id-usuario-programa-nivel`='$idUsuarioProgramaNivel'";
+                $resultado = mysqli_query($conexion,$consulta)
+                or die($mensajeErrorEliminar);
+                $mensaje = ['exito'=> 'si','mensaje' => 'Asociación de Usuario-Programa-Nivel, eliminada con éxito'];
+                $respuesta = json_encode($mensaje);
+                echo $respuesta;
+                break;
+                
             
             default:
                 # code...
