@@ -165,6 +165,40 @@ if($metodo === 'POST'){
             }
             break;
 
+        case 'editarMedalla':
+            $id = $_POST['id'];
+            $nombreMedalla = $_POST['nombreMedalla'];  
+            $target_path = "imagenes/medallas/";
+            $target_path = $target_path . basename( $_FILES['archivo']['name']); 
+            $ruta_imagen = 'http://localhost/api-administracion/' . $target_path;
+            $errorConsulta = ['exito' => 'no', 'mensaje' => 'Error al verificar'];
+            $mensajeErrorConsulta = json_encode($errorConsulta);    
+            $consulta = "SELECT * FROM medallas WHERE nombreMedalla = '$nombreMedalla' AND `id-medalla` != '$id'";
+            $mostrar = mysqli_query($conexion,$consulta)
+            or die($mensajeErrorConsulta);
+            $row_cnt = mysqli_num_rows($mostrar); 
+            if ($row_cnt > 0) {
+                $mensaje = ['exito'=> 'no','mensaje' => 'Ya existe otra Medalla con este Nombre'];
+                $respuesta = json_encode($mensaje);
+                echo $respuesta;
+            }else{
+                if(move_uploaded_file($_FILES['archivo']['tmp_name'], $target_path)) {     
+                    $errorInsertar = ['exito' => 'no', 'mensaje' => 'Error al Actualizar'];
+                    $mensajeErrorInsertar = json_encode($errorInsertar);
+                    $insertar = "UPDATE medallas SET nombreMedalla = '$nombreMedalla', linkImagenMedalla = '$ruta_imagen' WHERE `id-medalla` = '$id'";
+                    $guardar = mysqli_query($conexion,$insertar)
+                    or die($mensajeErrorInsertar);
+                    $mensaje = ['exito' => 'si', 'mensaje' => 'Medalla actualizada en el servidor'];
+                    $respuesta = json_encode($mensaje);
+                    echo $respuesta;
+                }else{
+                    $errorImagen = ['exito' => 'no', 'mensaje' => 'Error al Cargar la imagen de la medalla en el servidor'];
+                    $mensajeErrorImagen = json_encode($errorImagen);
+                    echo $mensajeErrorImagen;
+                }
+            }
+            break;
+
         
         default:
             
@@ -173,6 +207,7 @@ if($metodo === 'POST'){
 }else if($metodo === 'PUT'){
 
     switch ($tipo) {
+        
         
 
         

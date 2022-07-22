@@ -407,6 +407,17 @@
                 $listado_json = json_encode($lista_medallas);
                 echo $listado_json;
                 break;
+            
+            case 'medalla':
+                $idMedalla = $_GET['id'];
+                $consulta = "SELECT * FROM medallas WHERE `id-medalla` = '$idMedalla'";
+                $mostrar = mysqli_query($conexion,$consulta)
+                or die("error al traer los datos");
+                $extraido = mysqli_fetch_array($mostrar);
+                $respuesta = ['id' => $extraido['id-medalla'], 'nombreMedalla' => $extraido['nombreMedalla'], 'imagePreviewUrl' => $extraido['linkImagenMedalla']];
+                $respuesta_json = json_encode($respuesta);
+                echo $respuesta_json; 
+                break;
 
             case 'medallaSemanal':
                 $idMedallaSemanal = $_GET['id'];
